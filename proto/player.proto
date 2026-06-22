@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package game.player;
+
+service PlayerService {
+  rpc GetPlayer(GetPlayerRequest) returns (PlayerResponse);
+  rpc UpdatePlayerScore(UpdateScoreRequest) returns (PlayerResponse);
+  rpc CreatePlayer(CreatePlayerRequest) returns (PlayerResponse);
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+}
+
+message GetPlayerRequest {
+  int64 player_id = 1;
+}
+
+message CreatePlayerRequest {
+  string username = 1;
+  int32 starting_score = 2;
+}
+
+message UpdateScoreRequest {
+  int64 player_id = 1;
+  int32 score_delta = 2;
+}
+
+message PlayerResponse {
+  int64 player_id = 1;
+  string username = 2;
+  int32 score = 3;
+  bool found = 4;
+  string error = 5;
+}
+
+message HealthCheckRequest {}
+
+message HealthCheckResponse {
+  bool healthy = 1;
+  string status_message = 2;
+}

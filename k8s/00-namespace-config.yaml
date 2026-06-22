@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: game-backend
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: game-backend-config
+  namespace: game-backend
+data:
+  POSTGRES_HOST: "postgres"
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: "gamedb"
+  REDIS_HOST: "redis"
+  REDIS_PORT: "6379"
+  PLAYER_SERVICE_ADDR: "player-service:50051"
+  MATCH_SERVICE_ADDR: "match-service:50052"
+  DB_POOL_SIZE: "8"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: game-backend-secrets
+  namespace: game-backend
+type: Opaque
+stringData:
+  POSTGRES_USER: gameuser
+  POSTGRES_PASSWORD: gamepass

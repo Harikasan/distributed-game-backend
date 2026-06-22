@@ -1,0 +1,16 @@
+{
+  "name": "gateway-service",
+  "version": "1.0.0",
+  "description": "REST gateway translating HTTP requests into gRPC calls to the player and match services",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.10.6",
+    "@grpc/proto-loader": "^0.7.13",
+    "express": "^4.19.2",
+    "cors": "^2.8.5"
+  }
+}

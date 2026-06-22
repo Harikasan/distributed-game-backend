@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package game.match;
+
+service MatchService {
+  rpc CreateMatch(CreateMatchRequest) returns (MatchResponse);
+  rpc GetMatch(GetMatchRequest) returns (MatchResponse);
+  rpc SubmitMatchResult(SubmitResultRequest) returns (MatchResponse);
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+}
+
+message CreateMatchRequest {
+  repeated int64 player_ids = 1;
+  string game_mode = 2;
+}
+
+message GetMatchRequest {
+  int64 match_id = 1;
+}
+
+message SubmitResultRequest {
+  int64 match_id = 1;
+  int64 winner_player_id = 2;
+  map<int64, int32> score_deltas = 3;
+}
+
+message MatchResponse {
+  int64 match_id = 1;
+  repeated int64 player_ids = 2;
+  string game_mode = 3;
+  string status = 4;
+  int64 winner_player_id = 5;
+  string error = 6;
+}
+
+message HealthCheckRequest {}
+
+message HealthCheckResponse {
+  bool healthy = 1;
+  string status_message = 2;
+}

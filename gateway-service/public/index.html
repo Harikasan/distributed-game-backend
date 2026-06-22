@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arena Console — Game Backend</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="bg-grid" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">▣</span>
+      <div class="brand-text">
+        <span class="brand-name">Arena Console</span>
+        <span class="brand-sub">Distributed match &amp; ranking backend</span>
+      </div>
+    </div>
+
+    <div class="status-strip" id="status-strip" role="status" aria-live="polite">
+      <div class="status-pill" data-svc="gateway">
+        <span class="dot"></span>
+        <span class="label">Gateway</span>
+      </div>
+      <div class="status-pill" data-svc="player">
+        <span class="dot"></span>
+        <span class="label">Player Svc</span>
+      </div>
+      <div class="status-pill" data-svc="match">
+        <span class="dot"></span>
+        <span class="label">Match Svc</span>
+      </div>
+      <button class="ping-btn" id="refresh-health" title="Re-check service health">
+        <span class="ping-icon" aria-hidden="true">↻</span> Ping
+      </button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- Signature element: live request-path tracer, mirrors the actual
+         architecture (gateway -> gRPC -> service -> store) and lights up
+         as real requests flow through it. -->
+    <section class="trace-strip" id="trace-strip" aria-hidden="true">
+      <div class="trace-node" data-node="client">
+        <span class="trace-icon">▢</span>
+        <span class="trace-label">Browser</span>
+      </div>
+      <div class="trace-line" data-line="client-gateway"></div>
+      <div class="trace-node" data-node="gateway">
+        <span class="trace-icon">▣</span>
+        <span class="trace-label">Gateway</span>
+        <span class="trace-sub">REST</span>
+      </div>
+      <div class="trace-line" data-line="gateway-service"></div>
+      <div class="trace-node" data-node="service">
+        <span class="trace-icon">◧</span>
+        <span class="trace-label" id="trace-service-label">Service</span>
+        <span class="trace-sub">gRPC</span>
+      </div>
+      <div class="trace-line" data-line="service-store"></div>
+      <div class="trace-node" data-node="store">
+        <span class="trace-icon">▥</span>
+        <span class="trace-label" id="trace-store-label">Postgres</span>
+      </div>
+    </section>
+
+    <!-- LEFT: Actions -->
+    <section class="col col-actions">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>New player</h2>
+          <span class="panel-tag">player-service</span>
+        </div>
+        <form id="form-create-player" class="stack" autocomplete="off">
+          <label class="field">
+            <span class="field-label">Username</span>
+            <input type="text" name="username" placeholder="e.g. nova_striker" required maxlength="32" />
+          </label>
+          <label class="field">
+            <span class="field-label">Starting score</span>
+            <input type="number" name="starting_score" value="1000" min="0" step="1" />
+          </label>
+          <button type="submit" class="btn btn-primary">
+            <span>Create player</span>
+          </button>
+        </form>
+        <p class="hint" id="create-player-hint"></p>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>New match</h2>
+          <span class="panel-tag">match-service</span>
+        </div>
+        <form id="form-create-match" class="stack" autocomplete="off">
+          <label class="field">
+            <span class="field-label">Player A ID</span>
+            <input type="number" name="player_a" placeholder="1" min="1" required />
+          </label>
+          <label class="field">
+            <span class="field-label">Player B ID</span>
+            <input type="number" name="player_b" placeholder="2" min="1" required />
+          </label>
+          <label class="field">
+            <span class="field-label">Game mode</span>
+            <select name="game_mode">
+              <option value="ranked_1v1">Ranked 1v1</option>
+              <option value="quickplay">Quickplay</option>
+              <option value="tournament">Tournament</option>
+            </select>
+          </label>
+          <button type="submit" class="btn btn-primary">
+            <span>Start match</span>
+          </button>
+        </form>
+        <p class="hint" id="create-match-hint"></p>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Submit result</h2>
+          <span class="panel-tag">cross-service call</span>
+        </div>
+        <form id="form-submit-result" class="stack" autocomplete="off">
+          <label class="field">
+            <span class="field-label">Match ID</span>
+            <input type="number" name="match_id" placeholder="1" min="1" required />
+          </label>
+          <label class="field">
+            <span class="field-label">Winner player ID</span>
+            <input type="number" name="winner_id" placeholder="1" min="1" required />
+          </label>
+          <div class="field-row">
+            <label class="field">
+              <span class="field-label">Winner Δ score</span>
+              <input type="number" name="winner_delta" value="25" />
+            </label>
+            <label class="field">
+              <span class="field-label">Loser Δ score</span>
+              <input type="number" name="loser_delta" value="-15" />
+            </label>
+          </div>
+          <label class="field">
+            <span class="field-label">Loser player ID</span>
+            <input type="number" name="loser_id" placeholder="2" min="1" required />
+          </label>
+          <button type="submit" class="btn btn-primary">
+            <span>Submit result</span>
+          </button>
+        </form>
+        <p class="hint" id="submit-result-hint"></p>
+      </div>
+    </section>
+
+    <!-- RIGHT: Live data -->
+    <section class="col col-data">
+      <div class="panel panel-lookup">
+        <div class="panel-head">
+          <h2>Player lookup</h2>
+          <span class="panel-tag">Redis cache-aside</span>
+        </div>
+        <form id="form-lookup" class="lookup-row" autocomplete="off">
+          <input type="number" name="player_id" placeholder="Enter player ID…" min="1" required />
+          <button type="submit" class="btn btn-secondary">Look up</button>
+        </form>
+        <div id="lookup-result" class="lookup-result" hidden>
+          <div class="lookup-card">
+            <div class="lookup-name" id="lookup-name">—</div>
+            <div class="lookup-meta">
+              <span class="meta-id" id="lookup-id">#0</span>
+              <span class="meta-score" id="lookup-score">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-leaderboard">
+        <div class="panel-head">
+          <h2>Tracked players</h2>
+          <span class="panel-tag">live, this session</span>
+        </div>
+        <div class="table-wrap">
+          <table class="leaderboard" id="leaderboard-table">
+            <thead>
+              <tr>
+                <th class="col-rank">Rank</th>
+                <th class="col-name">Player</th>
+                <th class="col-id">ID</th>
+                <th class="col-score">Score</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-body">
+              <tr class="empty-row">
+                <td colspan="4">No players tracked yet — create one to begin.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel panel-log">
+        <div class="panel-head">
+          <h2>Activity log</h2>
+          <span class="panel-tag">REST → gRPC</span>
+        </div>
+        <ul class="activity-log" id="activity-log">
+          <li class="log-empty">Actions you take will appear here in real time.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>Arena Console · talks to the gateway's REST API, which fans out over gRPC to the player &amp; match services</span>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>
