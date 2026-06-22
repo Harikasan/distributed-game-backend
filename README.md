@@ -123,7 +123,7 @@ The dashboard visualizes actual service interactions. When match results are sub
 ### Clone Repository
 
 ```bash
-git clone https://github.com/<your-username>/distributed-game-backend.git
+git clone https://github.com/Harikasan/distributed-game-backend.git
 cd distributed-game-backend
 ```
 
