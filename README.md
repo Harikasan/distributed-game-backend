@@ -204,22 +204,7 @@ GitHub Actions automatically:
 
 ---
 
-## Skills Demonstrated
 
-- Distributed Systems
-- Microservices Architecture
-- gRPC Communication
-- Redis Caching
-- PostgreSQL Optimization
-- Fault-Tolerant Design
-- Circuit Breakers & Retry Logic
-- Docker
-- Kubernetes
-- Load Testing
-- Backend System Design
-- CI/CD Automation
-
----
 
 ## License
 
