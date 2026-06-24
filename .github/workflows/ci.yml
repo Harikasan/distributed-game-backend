@@ -97,7 +97,25 @@ jobs:
             echo "waiting for gateway... ($i)"
             sleep 5
           done
+          
+      - name: Start app
+        run: docker compose up -d --build
+      
+      - name: Wait for app
+        run: |
+          for i in {1..30}; do
+            curl -f http://localhost:8080/healthz && exit 0
+            sleep 2
+          done
+          docker compose logs
+          exit 1
+      
+      - name: Run smoke test
+        run: |
+          chmod +x scripts/smoke_test.sh
+          ./scripts/smoke_test.sh
 
+        
       - name: Run smoke test
         run: |
           chmod +x scripts/smoke_test.sh
