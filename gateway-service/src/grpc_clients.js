@@ -2,7 +2,7 @@ const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
 const path = require('path');
 
-const PROTO_DIR = path.join(__dirname, '..', '..', 'proto');
+const PROTO_DIR = path.join(__dirname, '..', 'proto');
 
 const loaderOptions = {
   keepCase: true,
