@@ -6,7 +6,6 @@ COPY gateway-service/package.json ./
 RUN npm install --omit=dev
 
 COPY gateway-service/src ./src
-COPY proto ./proto
 COPY gateway-service/public ./public
 COPY proto ./proto
 
